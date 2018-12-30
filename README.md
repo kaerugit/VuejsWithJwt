@@ -1,6 +1,9 @@
 
 # VuejsWithJwt(.net asp core)
-純粋なVuejsとJwt認証を.net coreで対応したサンプルです。
+純粋なVuejsとJwt認証を.net coreで対応したサンプルです。  
+プロジェクトは .net asp core rezor pagesを使用  
+rezorでゴリゴリ書きながらクライアントはvue  
+データのやり取りはすべてapiというプロジェクトです。  
 
 ## 開発環境
 visual　studio 2017（+.net asp core 2.1）   
@@ -32,7 +35,10 @@ https://bulma.io/
 ## サンプルアプリについて
 以下のAPI部分を修正して作成しました。  
 https://github.com/kaerugit/VuejsTableInput  
-順次公開（予定？）
+順次追加（予定？）
+
+## 参考
+https://github.com/tinohager/AspNetCore.JwtBearer.VueJS  
 
 ## License
 [MIT](LICENSE.txt)
