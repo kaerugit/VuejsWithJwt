@@ -1,0 +1,58 @@
+﻿@page
+@model VuejsWithJwt.Pages.MenuModel
+@{
+    ViewData["Title"] = "Menu";
+}
+
+<div id="app">
+    <div class="column">
+        <article class="message is-success">
+            <div class="message-header">
+                <p>サンプル（■■PCブラウザ推奨！！■■）</p>
+            </div>
+            <div class="message-body MessageBodyPanel">
+                <div class="field is-horizontal">
+                    <div class="field-body">
+                        <button class="button is-info is-fullwidth" onclick="window.location.href = './Sample/ShainMastervscroll';">本気の社員マスタ(仮想スクロール版)</button>
+                    </div>
+                </div>
+                <div class="field is-horizontal" style="display:none;">
+                    <div class="field-body">
+                        <button class="button is-info is-fullwidth" style="height:60px" onclick="window.location.href = './Sample/summarytestvscroll';">入力-合計計算(仮想スクロール(virtual scroll))<br />※1000件程度でも良好</button>
+                    </div>
+                </div>
+                <div class="field is-horizontal">
+                    <div class="field-body">
+                        <button class="button is-info is-fullwidth" v-on:click="getAPItest()">通常APIテスト</button>
+                    </div>
+                </div>
+                <div class="field is-horizontal">
+                    <div class="field-body">
+                        <button class="button is-info is-fullwidth" onclick="window.location.href = './';">ログインへ戻る</button>
+                    </div>
+                </div>
+
+            </div>
+        </article>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script>
+
+        var app = new Vue({
+            el: '#app',
+            methods: {
+                getAPItest: function () {
+                    Project.PostApi('/api/Test').then(
+                        function (data) {
+                            alert(data);
+                        }
+                    );
+
+                }
+            }
+        });
+    </script>
+}

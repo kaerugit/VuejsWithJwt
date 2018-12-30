@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+
+    <environment include="Development">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+        <link rel="stylesheet" href="~/lib/bulma.min.css" />
+        <link rel="stylesheet" href="~/css/project.css" />
+    </environment>
+
+    @*Developmentでない場合*@
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+        <link rel="stylesheet" href="~/lib/bulma.min.css" />
+        <link rel="stylesheet" href="~/css/project.css" />
+    </environment>
+
+</head>
+<body>
+    @*【jwt追加】CSRF 対策*@
+
+    @*
+        下の　asp-antiforgery="true"　にするかどちらか（作成されるtagは同じ）
+        @Html.AntiForgeryToken()
+    *@
+
+    @* asp-antiforgery=trueにすると@Html.AntiForgeryToken()が必要なし　actionの文字列を使用 *@
+    <form asp-antiforgery="true" asp-action=""></form>
+
+
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+    </div>
+
+    <environment include="Development">
+        <script src="~/lib/vue.js"></script>
+        <script src="~/lib/js.cookie.js"></script>
+        @* promiseで使用(IE11用) *@
+        <script src="~/lib/es6-promise.auto.min.js"></script>
+        <script asp-src-include="~/js/*.js" asp-append-version="true"></script>
+    </environment>
+
+    @*Developmentでない場合*@
+    <environment exclude="Development">
+        <script src="~/lib/vue.min.js"></script>
+        <script src="~/lib/js.cookie.js"></script>
+        @* promiseで使用(IE11用) *@
+        <script src="~/lib/es6-promise.auto.min.js"></script>
+        <script asp-src-include="~/js/*.js" asp-append-version="true"></script>
+    </environment>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,637 @@
+﻿@page
+@model VuejsWithJwt.Pages.Sample.ShainMastervscrollModel
+@{
+    ViewData["Title"] = "社員マスタ";
+}
+
+<div id="app" style="visibility:hidden;">
+    <!--
+        マスタページっぽいもの(再利用可能なものはコンポーネント化する)
+        <div id="app" style="visibility:hidden;"> visibilityを削除する処理も入っています。
+    -->
+    <master-page></master-page>
+
+    <div class="columns">
+        <!-- !isDisplayWherePanel の場合 css WherePanelMinWidth(project.cssで定義)を利用 -->
+        <div class="column" v-bind:class="{ '' : isDisplayWherePanel,'WherePanelMinWidth' : !isDisplayWherePanel}">
+            <article class="message is-success">
+                <!-- 自分でOPEN CLOSE -->
+                <div class="message-header" v-on:click="isDisplayWherePanel = !isDisplayWherePanel;">
+                    <!-- スマホ(画面が小さい)の場合はそのまま -->
+                    <p v-bind:class="{ '' : isDisplayWherePanel,'WherePanelTitleVisible' : !isDisplayWherePanel}">条件</p>
+
+                    <span class="icon">
+                        <i class="fas fa-search"></i>
+                    </span>
+                </div>
+                <div class="message-body MessageBodyPanel" v-show="isDisplayWherePanel">
+                    <template v-for="(elem, elemIndex) in whereItems">
+                        <!-- 表形式と同様にする為必ず配列ループを基本とする -->
+
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">社員コード</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <input v-model.lazy="elem.社員コード" v-dora_update="elem" class="input" isime="false" ishankaku="true" maxlengthvalue="5" textalign="center" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">社員名</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field has-addons">
+                                    <!-- has-addons で一行表示-->
+                                    <p class="control">
+                                        <input v-model.lazy="elem.社員名" v-dora_update="elem" isime="true" maxlengthvalue="10" class="input" />
+                                    </p>
+                                    <p class="control">
+                                        <a class="button is-static">
+                                            を含む
+                                        </a>
+                                    </p>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">都道府県CD</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <div class="select">
+                                            <select v-model.lazy="elem.都道府県CD" v-dora_update="elem" v-dora_selectitems="todofukenItems" dora_blanktext="(選択なし)"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">都道府県CD(ラジオ)</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <span>
+                                            <input type="radio" id="opt" value="" v-dora_update="elem" v-model="elem.都道府県CD" class="radio">
+                                            <label for="opt">(選択なし)</label>
+                                        </span>
+                                        <!-- radio単一選択(複数存在する場合は 'opt'を変更する) -->
+                                        <span v-for="option in todofukenItems">
+                                            <input type="radio" v-bind:id="['opt' + elemIndex + '_' + option.value]" v-bind:value="option.value" v-dora_update="elem" v-model="elem.都道府県CD" class="radio">
+                                            <label v-bind:for="['opt' + elemIndex + '_' + option.value]">{{option.text}}</label>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">都道府県CD(複数選択)</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <!-- checkbox複数(複数存在する場合は 'chk'を変更する)-->
+                                        <span v-for="option in todofukenItems">
+                                            <input type="checkbox" v-model.lazy="elem.都道府県CD複数" v-dora_update="elem" v-bind:id="['chk' + elemIndex + '_' + option.value]" v-bind:value="option.value" class="checkbox">
+                                            <label v-bind:for="['chk' + elemIndex + '_' + option.value]">{{option.text}}</label>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                    <button class="button is-info" v-on:click="search()">検索</button>
+                </div>
+            </article>
+        </div>
+
+        <div class="column" v-bind:class="{ 'is-8' : isDisplayWherePanel,'is-11' : !isDisplayWherePanel}">
+            <article class="message is-primary">
+                <div class="message-header">
+                    <p>入力</p>
+                    <span class="icon">
+                        <i class="fas fa-edit"></i>
+                    </span>
+                </div>
+                <div class="message-body MessageBodyPanel">
+
+                    <button class="button is-primary" v-on:click="submit()">更新</button>
+                    <button class="button is-danger" v-on:click="clear()">クリア</button>
+                    <button class="button is-warning" v-on:click="append()">1件追加</button>
+                    <button class="button is-warning" v-on:click="append(1000)">【大量データテスト】1000件追加</button>
+
+
+                    <!-- 仮想スクロールにはこちらが必要 -->
+                    <div style="position:relative">
+                        <div id="divPaging" class="TablePanelVirtual">
+                            <!-- スタイルをbind v-bind:style="{ width: tablewidth + 'px' }" -->
+                            <!-- v-dora_table="" は　width　の自動計算をしているだけです -->
+                            <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth" v-dora_table="">
+                                <thead>
+                                    <tr>
+                                        <!-- stickyは固定(IEは対応していない) -->
+                                        <th style="width: 50px;position: sticky;left: 0px;z-index: 10;" class="is-link">削除</th>
+                                        <th style="width: 130px;" class="is-link" v-bind:class="sortdisp('社員コード')" v-on:click="sort('社員コード')">社員コード</th>
+                                        <th style="width: 200px;" class="is-link" v-bind:class="sortdisp('社員名')" v-on:click="sort('社員名')">社員名</th>
+                                        <th style="width: 200px;" class="is-link" v-bind:class="sortdisp('入社年月日')" v-on:click="sort('入社年月日')">入社年月日</th>
+                                        <th style="width: 150px;" class="is-link">性別</th>
+                                        <th style="width: 300px;" class="is-link">扶養家族</th>
+                                        <th style="width: 200px;" class="is-link">都道府県</th>
+                                        <th style="width: 200px;" class="is-link">市区町村</th>
+                                        <th style="width: 200px;" class="is-link">町域</th>
+                                        <th style="width: 300px;" class="is-link">住所</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- 各要素を表示 -->
+                                    <!-- err-common はproject.cssに定義(エラー行に色を付ける) -->
+                                    <!-- elem[DoraConst.FIELD_ERROR_FLAG]と書けない -->
+                                    <tr v-for="(elem, elemIndex) in displayItems" v-bind:class="{'err-common' : elem['ERROR_FLAG']==true}">
+                                        <td style="text-align:center;position: sticky;left: 0px;z-index: 10;background-color:white;">
+                                            <!-- v-dora_update="elem"(directive) で テキストボックスのformat, UPDATE_FLAGの処理を実行  -->
+                                            <input type="checkbox" v-model.lazy="elem['DELETE_FLAG']" v-dora_update="elem" class="checkbox" />
+                                        </td>
+                                        <td>
+                                            <!-- 新規の場合しか入力不可(isprimarykey="true" & NEW_FLAG=trueの場合 ⇒ project.js Project.SetControlCss で処理) -->
+                                            <!--
+                                            バリデーション 半角入力 ～5桁  textalignはproject.jsで処理(本来はclass に直接記述する事推奨)
+                                            -->
+                                            <input v-model.lazy="elem.社員コード" v-dora_update="elem" class="input" isime="false" isprimarykey="true" ishankaku="true" maxlengthvalue="5" textalign="center" />
+                                        </td>
+                                        <td>
+                                            <!-- バリデーション ～10桁  isime(project.jsで処理) -->
+                                            <input v-model.lazy="elem.社員名" v-dora_update="elem" isime="true" maxlengthvalue="10" class="input" />
+                                        </td>
+                                        <td>
+                                            <!-- フォーマットが入っているものは自動的に imeoff -->
+                                            <input v-model.lazy="elem.入社年月日" v-dora_update="elem" dora_format="yyyy/MM/dd" class="input" />
+                                        </td>
+                                        <td style="text-align:center">
+                                            <!-- radio-->
+                                            <span v-for="option in seibetuType">
+                                                <input type="radio" v-bind:id="['optSeibetu' + elemIndex + '_' + option.value]" v-bind:value="option.value" v-dora_update="elem" v-model="elem.性別区分" class="radio">
+                                                <label v-bind:for="['optSeibetu' + elemIndex + '_' + option.value]">{{option.text}}</label>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <!-- checkbox複数(ラベルチェック時にONにする処理不要であれば v-bind:id v-bind:for の処理は削除可) -->
+                                            <span v-for="option in fuyokazokuType">
+                                                <input type="checkbox" v-model.lazy="elem.扶養家族区分" v-dora_update="elem" v-bind:id="['chkFuyo' + elemIndex + '_' + option.value]" v-bind:value="option.value" class="checkbox">
+                                                <label v-bind:for="['chkFuyo' + elemIndex + '_' + option.value]">{{option.text}}</label>
+                                            </span>
+                                            <!-- List複数
+                                            <select v-model.lazy="elem.扶養家族区分" v-dora_update="elem" v-dora_selectitems="fuyokazokuType" dora_blanktext="選択してください" class="select is-multiple" size="3" multiple></select>
+                                            -->
+                                        </td>
+                                        <td s>
+                                            <div class="select">
+                                                <select v-model.lazy="elem.都道府県CD" v-dora_update="elem" v-dora_selectitems.once="todofukenItems" dora_blanktext="(選択なし)" v-on:change="changeTodofuken(elem)"></select>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <!--都道府県により変更-->
+                                            <div class="select">
+                                                <select v-model.lazy="elem.市区町村CD" v-dora_update="elem" v-dora_selectitems="getShikuchoson(elem.都道府県CD)" dora_blanktext="(選択なし)" v-on:change="changeShikuchoson(elem)"></select>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <!--都道府県、市区町村により変更-->
+                                            <div class="select">
+                                                <select v-model.lazy="elem.町域CD" v-dora_update="elem" v-dora_selectitems="getChoiki(elem.都道府県CD,elem.市区町村CD)" dora_blanktext="(選択なし)"></select>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <!-- バリデーション ～20桁  imeON(project.jsで処理) -->
+                                            <input v-model.lazy="elem.住所" v-dora_update="elem" isime="true" maxlengthvalue="20" class="input" />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!--
+                        仮想ページングオブジェクト
+                        ref="page" は、親から子の関数を呼ぶために使用 this.$refs.page.gotoindex(i);
+                        ⇒ページングオブジェクトが複数あるような画面は ref="page2" と名前を変更する
+                        dora_bind_divはclass="TablePanelVirtual"のidを指定
+                        ⇒ページングオブジェクトが複数ある場合は変更が必要です。
+                        v-bind:dora_height：行の高さを設定（この高さと違う行がある場合は動作がおかしくなります。）
+                        v-bind:dora_display_panel.sync：は データが0件の場合：true それ以外の場合:falseが設定されます（連動不要なら削除可）
+                        -->
+                        <dora-vscroll v-bind:dora_bind_items="bindItems" v-model="displayItems" class="VirtualScroll" dora_bind_div="divPaging" v-bind:dora_height="rowheight" v-bind:dora_display_panel.sync="isDisplayWherePanel" ref="page"></dora-vscroll>
+
+                    </div>
+                </div>
+            </article>
+        </div>
+    </div>
+</div>
+
+
+
+@* @RenderSection("Scripts", false) からセット *@
+@section Scripts{
+
+    <script>
+        'use strict';
+
+        var vm = new Vue({
+            el: '#app',
+            created: function () {
+                //domが絡む場合はmountedを初期にしたほうがよい
+            }
+            ,
+            mounted: function () {
+
+
+                Project.PostApi("Init", {}).then(
+                    function (data) {
+                        let mainItems = data["todofuken"];
+
+
+                        //都道府県
+                        let appendList = new Set();
+
+                        for (let item in mainItems) {
+
+                            if (appendList.has(mainItems[item].都道府県CD) == false) {
+
+                                //追加
+                                appendList.add(mainItems[item].都道府県CD);
+
+                                this.todofukenItems.push({
+                                    value: mainItems[item].都道府県CD,
+                                    text: mainItems[item].都道府県,
+                                });
+
+                            }
+                        }
+
+                        //sort
+                        Project.SortJson(this.todofukenItems, ["value"]);
+
+                        //市区町村
+                        appendList = new Set();
+                        for (let item in mainItems) {
+
+                            if (appendList.has(mainItems[item].市区町村CD) == false) {
+
+                                //追加
+                                appendList.add(mainItems[item].市区町村CD);
+
+                                this.shikuchosonItems.push({
+                                    都道府県CD: mainItems[item].都道府県CD,
+                                    value: mainItems[item].市区町村CD,
+                                    text: mainItems[item].市区町村,
+                                });
+
+                            }
+                        }
+
+                        //sort
+                        Project.SortJson(this.shikuchosonItems, ["value"]);
+
+                        //町域
+                        appendList = new Set();
+                        for (let item in mainItems) {
+
+                            if (mainItems[item].町域CD && appendList.has(mainItems[item].町域CD) == false) {
+
+                                //追加
+                                appendList.add(mainItems[item].町域CD);
+
+                                this.choikiItems.push({
+                                    都道府県CD: mainItems[item].都道府県CD,
+                                    市区町村CD: mainItems[item].市区町村CD,
+                                    value: mainItems[item].町域CD,
+                                    text: mainItems[item].町域 ? mainItems[item].町域 : '(該当なし)',
+                                });
+
+                            }
+                        }
+
+                        //sort
+                        Project.SortJson(this.choikiItems, ["value"]);                        
+
+                        this.clear();
+                    }.bind(this)       //ieを考慮する場合、アロー関数(()=>)が使えないのでこちらの書き方推奨
+                )
+            }
+            ,
+            data: {
+                //1行の高さ（仮想スクロールでも使用） ※かなり重要
+                rowheight: 45,
+
+                InputItems: [],      //入力用データ（テスト用　本来は必要なし）
+
+                whereItems: [],     //条件バインド用()
+
+                bindItems: [],      //バインド用
+                displayItems: [],   //表示用 (bindItems をページ用コンポーネントでfilter)
+
+                //性別区分
+                seibetuType: [
+                    {
+                        value: 1,
+                        text: '男性'
+                    },
+                    {
+                        value: 2,
+                        text: '女性'
+                    },
+
+                ],
+
+                //扶養家族区分（複数選択）
+                fuyokazokuType: [
+                    {
+                        value: 1,
+                        text: '配偶者'
+                    },
+                    {
+                        value: 2,
+                        text: '第一子'
+                    },
+                    {
+                        value: 3,
+                        text: '第二子'
+                    },
+                    {
+                        value: 4,
+                        text: '第三子'
+                    },
+
+                ],
+
+                todofukenItems: [],     //都道府県コンボ用
+                shikuchosonItems: [],   //市区町村コンボ用
+                choikiItems: [],        //町域コンボ用
+
+                sortOrders: {},        //ソートキー
+                //検索用のパネルの制御(本来は部品化したい) ※こちらのサンプルでは半部品化
+                isDisplayWherePanel: true,
+            },
+            methods: {
+                // 要素を追加
+                append: function (appendCount) {
+                    //先頭に追加
+                    //this.bindItems.unshift({});
+
+                    if (appendCount == null) {
+                        appendCount = 1;
+                    }
+
+                    for (let i = 0; i < appendCount; i++) {
+
+                        //先頭に追加(デフォルト値あり) 新規入力の場合、こちらセットしないとプルダウンの連動が出来ない
+                        this.bindItems.push({
+                            NEW_FLAG: true,
+                            //社員コード: i.toString(),
+                            //以下 基本的に必要ないが、他項目と連動する場合は、デフォルト値をセットする事
+                            扶養家族区分: [],      //配列定義しないと全チェックになる
+                            性別区分: 1,
+                            都道府県CD: '',         //'31'
+                            市区町村CD: '',      //こちら入れないと関連している項目が動作しない 　課題：値入れると重たくなる '31371'　
+                            町域CD: '',
+
+                        });
+                    }
+
+                    //スクロールを先頭
+                    this.$refs.page.gotoindex(this.bindItems.length - 1, "社員コード");
+                },
+
+                sort: function (sortKey) {
+
+                    if (this.sortOrders[sortKey] == null) {
+                        this.sortOrders = {};
+                        this.sortOrders[sortKey] = -1;  //昇順
+                    }
+                    else {
+                        this.sortOrders[sortKey] = this.sortOrders[sortKey] * -1;
+                    }
+
+                    //this.sortOrders を使用するとアイコン表示されるため別変数とする
+                    let sortObj = JSON.parse(JSON.stringify(this.sortOrders));
+
+                    //入社年月日が同じバイは、第二キーを社員コードで並び替え
+                    if (sortObj["社員コード"] == null) {
+                        sortObj["社員コード"] = -1;  //昇順
+                    }
+
+                    //ソート（オブジェクト版）
+                    Project.SortJson(this.bindItems, sortObj);
+
+                }
+                ,
+                //ソート△の表示(cssを戻す) css sort asc desc は project.css に定義
+                sortdisp: function (sortKey) {
+                    if (this.sortOrders[sortKey] == null) {
+                        return "sort";
+                    }
+                    else if (this.sortOrders[sortKey] < 0) {
+                        return "sort asc";
+                    }
+                    else {
+                        return "sort desc";
+                    }
+                }
+                ,
+                submit: function () {       
+
+                    let promise = null;
+                    Project.SetLoading(true);   //２度押し防止用くるくる（開始）
+
+                    try {
+                        if (
+                            //こちらの関数内でIDENTITYをセット
+                            Project.IsSubmitValidateError(
+                                this,
+                                this.bindItems,
+                                //主キー項目
+                                ['社員コード'],
+                                //必須項目
+                                ['社員コード', '社員名'],
+                                //個別チェック
+                                function (paraError, paraItem) {
+                                    //都道府県を入力した場合に市区町村CDが入力されていない場合
+                                    if (paraItem.都道府県CD != null && paraItem.都道府県CD.length > 0) {
+                                        if (paraItem.市区町村CD == null || paraItem.市区町村CD.length == 0) {
+                                            paraError.Field = "都道府県CD";     //フォーカスを移動したいフィールド
+                                            paraError.Message = "都道府県CDを入力した場合は、市区町村CDを入力してください。";
+                                            return;
+                                        }
+                                    }
+                                }
+                                ,
+                                //ページ移動用のfunction
+                                function () {
+                                    let errorItems = this.bindItems.filter(
+                                        function (item) {
+                                            return Project.IsBoolean(item[DoraConst.FIELD_ERROR_FLAG]);
+                                        }
+                                    );
+
+                                    if (errorItems.length > 0) {
+                                        //FIELD_IDENTITY_IDはIsSubmitValidateError内でセット
+                                        this.$refs.page.gotoindex(errorItems[0][DoraConst.FIELD_IDENTITY_ID]);
+                                    }
+                                }.bind(this)
+                            ) == true) {
+                            return;     //エラーの場合は終了
+                        }
+
+                        promise = Project.PostApi("Submit", this.bindItems).then(
+                            function (data) {
+                                if (data["error"] == null) {
+                                    alert('登録完了。登録したデータを検索可');
+                                    this.clear();
+                                }
+                                else {
+                                    ////サーバエラー時にはこちらのjsonをセット
+                                    //let error = {
+                                    //    ErrorIdentity: selectItems[0][DoraConst.FIELD_IDENTITY_ID],     //エラーフラグを付けるエラー行(本来はサーバ側でセット)
+                                    //    Field: '社員コード',
+                                    //    Message: '社員コードが重複しています。(★テスト)',
+                                    //};
+
+                                    //エラー行を先頭に移動し、エラーメッセージを表示
+                                    Project.MoveErrorFocus(this, this.bindItems, data["error"] ,
+                                        //ページ移動用のfunction
+                                        function () {
+                                            let errorItems = this.bindItems.filter(
+                                                function (item) {
+                                                    return Project.IsBoolean(item[DoraConst.FIELD_ERROR_FLAG]);
+                                                }
+                                            );
+
+                                            if (errorItems.length > 0) {
+                                                this.$refs.page.gotoindex(errorItems[0][DoraConst.FIELD_IDENTITY_ID]);
+                                            }
+                                        }.bind(this)
+                                    );
+                                }
+                            }.bind(this)       //ieを考慮する場合、アロー関数(()=>)が使えないのでこちらの書き方推奨
+                        )
+                    } finally {
+                        Project.SetLoading(false, promise);  //２度押し防止用くるくる（終了）
+                    }
+
+                }
+                ,
+                search: function () {
+
+                    let promise = null;
+                    Project.SetLoading(true);   //２度押し防止用くるくる（開始）
+
+                    try {
+                        promise = Project.PostApi("Search", this.whereItems[0]).then(
+                            function (data) {
+                                this.bindItems = data["search"];
+
+                                //スクロールを先頭
+                                this.$refs.page.gotoindex(0);
+                            }.bind(this)
+                        )
+                            //.catch(function(error) {
+                            //    console.log(error);
+                            //})
+                            ;
+
+                    }
+                    finally {
+                        Project.SetLoading(false, promise);  //２度押し防止用くるくる（終了）
+                    }
+
+                }
+                ,
+                clear: function () {
+
+                    //条件(コンボボックスの値を確実に表示したい場合はデフォルト値をセット)
+                    this.whereItems = [];
+                    this.whereItems.push({
+                        都道府県CD: '',
+                        都道府県CD複数: []		//配列の場合は定義が必要
+                    });
+
+                    //データのクリア
+                    this.bindItems = [];
+                }
+                ,
+                //市区町村の取得
+                getShikuchoson: function (todofukenCD) {
+                    if (todofukenCD == null || todofukenCD.length == 0) {
+                        return [];
+                    }
+
+                    return this.shikuchosonItems.filter(
+                        function (item) {
+                            let findFlag = true;
+
+                            if (findFlag == true && item.都道府県CD != todofukenCD) {
+                                findFlag = false;
+                            }
+
+                            return findFlag;
+                        }
+                    );
+                }
+                ,
+                //町域の取得
+                getChoiki: function (todofukenCD, shikuchosonCD) {
+                    if (todofukenCD == null || todofukenCD.length == 0) {
+                        return [];
+                    }
+
+                    if (shikuchosonCD == null || shikuchosonCD.length == 0) {
+                        return [];
+                    }
+
+                    return this.choikiItems.filter(
+                        function (item) {
+                            let findFlag = true;
+
+                            if (findFlag == true && item.都道府県CD != todofukenCD) {
+                                findFlag = false;
+                            }
+
+                            if (findFlag == true && item.市区町村CD != shikuchosonCD) {
+                                findFlag = false;
+                            }
+
+                            return findFlag;
+                        }
+                    );
+
+                }
+                ,
+                //都道府県変更時
+                changeTodofuken: function (elem) {
+                    elem.市区町村CD = '';
+                    elem.町域CD = '';
+                },
+                //市区町村変更時
+                changeShikuchoson: function (elem) {
+                    elem.町域CD = '';
+                },
+            },
+        });
+
+    </script>
+}

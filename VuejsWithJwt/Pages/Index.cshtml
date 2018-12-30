@@ -1,0 +1,104 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "LoginPage";
+}
+
+
+<div id="app">
+    <div class="columns">
+        <div class="column">
+            <article class="message is-success">
+                <div class="message-header">
+                    <p>ログイン</p>
+                    <span class="icon">
+                        <i class="fas fa-search"></i>
+                    </span>
+                </div>
+
+                <div class="message-body MessageBodyPanel">
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label">Userid (yama)</label>
+                        </div>
+                        <div class="field-body">
+                            <div class="field">
+                                <div class="control">
+                                    <input v-model="Userid" class="input" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label">Password (kawa)</label>
+                        </div>
+                        <div class="field-body">
+                            <div class="field">
+                                <div class="control">
+                                    <input type="password" v-model="Password" class="input" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field is-horizontal">
+                        <button class="button is-info" v-on:click="login()">ログイン</button>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </div>
+</div>
+
+
+
+@* @RenderSection("Scripts", false) からセット *@
+@section Scripts{
+
+    <script>
+
+        var app = new Vue({
+            el: '#app',
+            mounted: function () {
+
+                //一旦認証をクリア
+                let at = Cookies.get('access_token');
+                if (at != null || at.length > 0) {
+                    Cookies.remove('access_token');
+                    window.location.href = "./";
+                }
+            }
+            ,
+            data: {
+                Userid: 'yama',
+                Password: 'kawa',
+            },
+            methods: {
+                login: function () {
+                    //認証情報
+                    let credential = {
+                        Userid: this.Userid,
+                        Password: this.Password
+                    };
+
+                    Project.PostApi('Login', credential).then(
+                        function (data) {
+                            let date = new Date();
+                            date.setTime((new Date(data.expiration)));
+                            Cookies.set('access_token', data.token, { expires: date });
+                            alert('ログインしました。');
+                            window.location.href = "Menu";
+                        }
+                    )
+                    .catch(function(error) {
+                        alert('ログインできませんでした。');
+                    })
+                    ;
+
+
+                }
+            }
+        });       
+    </script>
+}

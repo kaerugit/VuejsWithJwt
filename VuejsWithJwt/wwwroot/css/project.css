@@ -1,0 +1,193 @@
+﻿/*
+    プロジェクト共通のCSS
+*/
+
+/* 以下project.jsと連動 */
+
+/** IMEモードONのスタイル(IE専用) */
+.ime-on {
+    ime-mode:active;
+}
+
+/** IMEモードOFFのスタイル(IE専用) */
+.ime-off {
+    ime-mode:disabled;
+}
+
+/** テキスト位置 */
+.text-center
+{
+    text-align: center;
+}
+
+.text-right
+{
+    text-align: right;
+}
+
+/* tableタグのみ 適用(エラー行のcss) */
+tbody > .err-common{
+    background-color:#ffebeb !important;
+}
+
+/* 主キー項目のcss(isprimarykey="true"と連動) */
+.primary-request {
+    background-color:#ffebeb!important;
+}
+
+/*単体のエラー(Project.SetControlCss functionで処理) */
+.err-control {
+    border-style:solid !important;
+    border-color:red !important;
+}
+
+/* 実行中くるくる */
+
+/*くるくるの背景 */
+.loader-bg {
+    background-color:gray;
+    opacity:0.2; 
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    z-index: 10;
+}
+/*くるくるのCSS */
+.loader{
+
+    position: fixed;
+    top: 45%;
+    left: 45%;
+    z-index: 10;
+    
+    width: 60px;
+    height: 60px;
+    border: 5px solid rgba(76, 255, 0,0.4);
+    border-top-color: rgba(76, 255, 0,0.9);
+    border-radius: 50%;
+	animation: spin 1.2s linear 0s infinite;
+}
+@keyframes spin {
+    0% {transform: rotate(0deg);}
+    100% {transform: rotate(360deg);}
+}
+
+/*iframeダイアログのcss */
+.iframeDialog{
+    position:absolute;
+    top: 0px;
+    left: 0px;
+
+    z-index: 1000;
+    
+    width: 100%;
+    height: 100%;
+}
+
+/* 以下project.jsと連動(終) */
+
+/*ソート*/
+th.sort{
+    text-decoration: underline;
+}
+
+th.asc::after{
+    display: inline-block;
+    content: '▲';
+}
+
+th.desc::after{
+    display: inline-block;
+    content: '▼';
+}
+/*ソート（終）*/
+
+/*タイトル固定(IE(position: sticky)は未対応)*/
+thead, tbody {
+    display: block; 
+}
+
+thead {
+    position: sticky;
+    top: 0px;
+    z-index: 100;
+}
+
+/*ページング用のパネル*/
+.PageingPanel{
+    padding: 5px;
+}
+
+/* <article class="message" の中だとページングの表示がおかしくなるのでちょっと力技 */
+.PageingPanel  a {
+    text-decoration:none !important;
+}
+.PageingPanel  a[class~=is-current]   {
+    color: #fff !important;
+}
+
+.TablePanelVirtual {
+    overflow: scroll;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    height: calc(100vh - 16.0rem);
+    width: calc(100% - 18px);
+    position: relative;
+}
+
+.VirtualScroll{
+    overflow: scroll;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    top:0px;
+    right: 0px;
+    width:18px;
+    height: calc(100vh - 16.0rem);
+    z-index:10;
+    position:absolute;
+}
+
+@media only screen and (min-width: 769px) { /* 769以上　PC用 */
+    .WherePanelMinWidth {
+        width: 80px !important;
+    }
+
+    .WherePanelTitleVisible {
+        display: none;
+    }
+
+    /*メッセージ(DIV)の高さ*/
+    .MessageBodyPanel{
+        overflow: auto;
+        height: calc(100vh - 10.0rem);
+    }
+
+    /*タイトルを固定しているテーブルの高さ*/
+    .TablePanel {
+        overflow: scroll;
+        overflow-x: scroll;
+        overflow-y: scroll;
+        height: calc(100vh - 18.0rem);
+        position: relative;
+        width: 100%;
+    }
+
+}
+
+@media only screen and (max-width: 768px) { /* 768以下 スマホ用 */
+    .WherePanelMinWidth {
+    }
+
+    .WherePanelTitleVisible {
+    }
+
+    .MessageBodyPanel{
+    }
+
+    .TablePanel{
+            overflow-x:scroll;
+            /*overflow-x: scroll;*/
+    }
+}
