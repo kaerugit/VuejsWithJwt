@@ -48,6 +48,8 @@ namespace VuejsWithJwt.Pages.Sample
             JObject json = new JObject();
             json.Add("todofuken", todofuken);
 
+            //複数必要な場合はaddする
+            //json.Add("xxx", yyyy);
             return new JsonResult(json);
 
         }
@@ -71,35 +73,32 @@ namespace VuejsWithJwt.Pages.Sample
                 ";
             }
 
-            var search = (JArray)JsonConvert.DeserializeObject(TestData.TestData.TestShainData);
-            
-           
-            //とりあえず、力技
-            var searchResult = search;
+			//とりあえず、力技
+            var searchResult = (JArray)JsonConvert.DeserializeObject(TestData.TestData.TestShainData);
 
 
             //社員コードが入っていないものは除く
             if (true)
             {
-                var result = search.Where(w => w["社員コード"]?.ToString().Length > 0 ).ToList();
+                var result = searchResult.Where(w => w["社員コード"]?.ToString().Length > 0 ).ToList();
                 searchResult = (JArray)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(result));
             }
 
             if (postjson["社員コード"]?.ToString().Length > 0)
             {
-                var result = search.Where(w => w["社員コード"].ToString() == postjson["社員コード"].ToString()).ToList();
+                var result = searchResult.Where(w => w["社員コード"].ToString() == postjson["社員コード"].ToString()).ToList();
                 searchResult = (JArray)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(result));
             }
 
             if (postjson["社員名"]?.ToString().Length > 0)
             {
-                var result = search.Where(w => w["社員名"].ToString().Contains(postjson["社員名"].ToString())).ToList();
+                var result = searchResult.Where(w => w["社員名"].ToString().Contains(postjson["社員名"].ToString())).ToList();
                 searchResult = (JArray)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(result));
             }
 
             if (postjson["都道府県CD"]?.ToString().Length > 0)
             {
-                var result = search.Where(w => w["都道府県CD"].ToString() == postjson["都道府県CD"].ToString()).ToList();
+                var result = searchResult.Where(w => w["都道府県CD"].ToString() == postjson["都道府県CD"].ToString()).ToList();
                 searchResult = (JArray)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(result));
             }
 
@@ -107,7 +106,7 @@ namespace VuejsWithJwt.Pages.Sample
             {
                 var lst = postjson["都道府県CD複数"].ToList().Select(s => s.ToString()).ToList();
 
-                var result = search.Where(w => lst.Contains(w["都道府県CD"].ToString())).ToList();
+                var result = searchResult.Where(w => lst.Contains(w["都道府県CD"].ToString())).ToList();
                 searchResult = (JArray)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(result));
             }
 
@@ -125,7 +124,7 @@ namespace VuejsWithJwt.Pages.Sample
         public JsonResult OnPostSubmit([FromBody] JToken postjson)
         {
 
-            //修正
+            //データ修正
             foreach (var sel in postjson)
             {
                 sel["UPDATE_FLAG"] = false;
@@ -133,13 +132,18 @@ namespace VuejsWithJwt.Pages.Sample
                 sel["DELETE_FLAG"] = false;
             }
 
-            TestData.TestData.TestShainData = JsonConvert.SerializeObject(postjson); ;
+            TestData.TestData.TestShainData = JsonConvert.SerializeObject(postjson);
 
             JObject json = new JObject();
 
             var error = "";
 
             //エラー時のテスト（コメント外すと動きます）
+            
+            //ErrorIdentity：移動する行
+            //Field：フォーカスを移動するフィールド
+            //Message：エラーメッセージ
+            
             //error = $@"
             //    {{
             //        ErrorIdentity: 1,

@@ -1,8 +1,8 @@
 ﻿
 Vue.component('master-page', {
     props:
-        {
-        }
+    {
+    }
     ,
     data: function () {
         return {
@@ -12,11 +12,11 @@ Vue.component('master-page', {
     mounted: function () {
         //chromeなどで一瞬vueのソースが見えるので、そちらの対策（チラチラ対策）
         window.addEventListener("load",
-                function () {
-                    //#app 
-                    //display:noneにすると高さなどの計算ができないので　visibilityで処理
-                    document.getElementById("app").style.visibility="visible";
-                }
+            function () {
+                //#app 
+                //display:noneにすると高さなどの計算ができないので　visibilityで処理
+                document.getElementById("app").style.visibility = "visible";
+            }
             , false);
     }
     ,

@@ -259,11 +259,13 @@
             ,
             mounted: function () {
 
+                //先にクリアしておく
+                this.clear();
 
                 Project.PostApi("Init", {}).then(
                     function (data) {
                         let mainItems = data["todofuken"];
-
+                        //複数のjsonはdata["xxx"];　で取得可
 
                         //都道府県
                         let appendList = new Set();
@@ -329,7 +331,7 @@
                         //sort
                         Project.SortJson(this.choikiItems, ["value"]);                        
 
-                        this.clear();
+                        
                     }.bind(this)       //ieを考慮する場合、アロー関数(()=>)が使えないのでこちらの書き方推奨
                 )
             }
@@ -413,7 +415,7 @@
                         });
                     }
 
-                    //スクロールを先頭
+                    //スクロールを最後
                     this.$refs.page.gotoindex(this.bindItems.length - 1, "社員コード");
                 },
 

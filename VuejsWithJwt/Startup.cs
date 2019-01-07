@@ -96,7 +96,7 @@ namespace VuejsWithJwt
                 app.UseHsts();
             }
 
-            //Åyjwtí«â¡ÅzîFèÿ     
+            //Åyjwtí«â¡Åz     
             app.UseJwtCookie();             //JwtCookieMiddleware
             app.UseAuthentication();
 
