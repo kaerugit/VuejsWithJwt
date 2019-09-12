@@ -11,7 +11,7 @@
     /*エラーがあった場合を判定するフィールド(modelに勝手に追加しているので必要ない場合は削除する必要がある)*/
     APPEND_IS_ERROR: "_IS_ERROR",
     /*エラーがあった場合にエラー値を格納するフィールド(modelに勝手に追加しているので必要ない場合は削除する必要がある)*/
-    APPEND_ERROR_VALUE: "_IS_ERROR_VALUE"
+    APPEND_ERROR_VALUE:"_IS_ERROR_VALUE"
 };
 
 Vue.directive('dora_table', {
@@ -137,11 +137,11 @@ Vue.directive('dora_update', {
         //データの取得（関数化）
         el.getModelData = function () {
 
-            if (el.dora_modelvalue != null) {
+            if (el.dora_modelvalue != null){
                 //el.dora_directivesdoraupdate.value[el.dora_modelvalue]  と同様（直接書いている所は意味があるので変更しないこと）
                 return el.dora_directivesmodel.value;
             }
-            else {
+            else{
                 return el.value;
             }
         };
@@ -219,9 +219,9 @@ Vue.directive('dora_update', {
 
             if (!(format == null || format.length == 0)) {
                 if (el.value.length == 0) {
-                    el.dora_directivesdoraupdate.value[el.dora_modelvalue] = null;
+                    el.dora_directivesdoraupdate.value[el.dora_modelvalue] = null;    
                     //vnode.context.$emit('input');
-
+                    
                 }
                 else {
                     let retvalue = DoraFormat.TransformFormat(el.value, format);
@@ -231,14 +231,14 @@ Vue.directive('dora_update', {
                     }
                     //変換できないものはとりあえずnullをセットしておく
                     //Vue.set(el.dora_directivesdoraupdate.value, el.dora_directivesmodel.expression, retvalue)
-                    el.dora_directivesdoraupdate.value[el.dora_modelvalue] = retvalue;
+                    el.dora_directivesdoraupdate.value[el.dora_modelvalue] = retvalue;    
                 }
 
             }
 
             if (message.length == 0) {
                 //project.js の関数を呼んでいます(※必ずメインでincludeしておいてください <script src="./javascript/doracomponent.js"></script>)
-                if (typeof Project.CheckValidate == 'function') {
+                if (typeof Project.CheckValidate == 'function') {   
                     message = Project.CheckValidate(el.dora_modelvalue, el.dora_directivesdoraupdate.value[el.dora_modelvalue]);
                 }
             }
@@ -281,11 +281,11 @@ Vue.directive('dora_update', {
                     if (binding.modifiers.bindingvaluedisp == true && el.getModelData() != null) {
                         ae.value = el.getModelData();
                     }
-
+                    
                     if (typeof ae.select == 'function') {
                         //課題　ieはこちらでOK　chromeはsetTimeoutが必要 edgeはsetTimeoutを入れると処理によって無限ループになる
                         ae.select();
-
+                                                                        
                     }
                 }
             );
@@ -345,7 +345,7 @@ Vue.directive('dora_update', {
                     break;
             }
         }
-
+        
         let inputerrorflag = el.isinputerror();
         if (typeof Project.SetControlCss == 'function') {
             Project.SetControlCss(el, el.dora_directivesdoraupdate, inputerrorflag);
@@ -368,7 +368,7 @@ Vue.directive('dora_update', {
             if (format == null || format.length == 0) {
                 return;
             }
-
+            
             if (el.getModelData() != null) {
                 el.value = DoraFormat.ParseFormat(el.getModelData(), format);
             }
@@ -520,7 +520,7 @@ Vue.component('dora-vscroll', {
             scrolltimer: null,
 
             //データ件数
-            oldCount: 0,
+            oldCount :0,
 
         }
     }
@@ -584,7 +584,7 @@ Vue.component('dora-vscroll', {
                         if (parentTR == listArrayTR[0]) {
                             firstFlag = true;
                         }
-                        if (parentTR == listArrayTR[listArrayTR.length - 1]) {
+                        if (parentTR == listArrayTR[listArrayTR.length-1]) {
                             lastFlag = true;
                         }
 
@@ -599,12 +599,12 @@ Vue.component('dora-vscroll', {
 
                     //見つかった場合
                     let moveIndex = 0;
-                    if (firstFlag == true || lastFlag == true) {
+                    if (firstFlag == true || lastFlag==true) {
 
-                        if ((evt.keyCode == 38) && (firstFlag == true)) {      //上
+                        if ((evt.keyCode == 38) && (firstFlag==true)) {      //上
                             moveIndex = -1;
                         }
-                        else if ((evt.keyCode == 40) && (lastFlag == true)) {       //下
+                        else if ((evt.keyCode == 40) && (lastFlag==true)) {       //下
                             moveIndex = 1;
                         }
                         else if ((lastEnterFlag) && (lastFlag == true)) {       //エンターキーで一番最後の項目
@@ -646,8 +646,8 @@ Vue.component('dora-vscroll', {
                 //true=ie 各ブラウザで加速度を調整したい場合はこちらを修正
                 let delta = evt.wheelDelta ? evt.wheelDelta / 40 : evt.detail ? -evt.detail / 3 : 0;
 
-                delta = Math.floor(-delta / 3);
-                if (delta != 0) {
+                delta = Math.floor(-delta/3);
+                if (delta !=0){
                     movefunction(delta, false);
                 }
                 return evt.preventDefault() && false;
@@ -694,12 +694,32 @@ Vue.component('dora-vscroll', {
                 this.mousedown();
             }.bind(this);
 
-        this.vscrollelement.addEventListener('DOMMouseScroll', vmouseWheelEvent);
-        this.vscrollelement.addEventListener('mousewheel', vmouseWheelEvent);
+        this.vscrollelement.addEventListener('DOMMouseScroll', vmouseWheelEvent );
+        this.vscrollelement.addEventListener('mousewheel', vmouseWheelEvent );
+
+        //スクロールバーのmouseover時（こちら入れないとエラー後にスクロールバーをクリックすると怪奇現象が起こる）
+        let vmouseoverEvent =
+            function (evt) {
+                this.mousedown();       //値の確定
+            }.bind(this)
+
+        this.vscrollelement.addEventListener('mouseover', vmouseoverEvent );
 
         //画面をリサイズした場合に表示数を変更
+        var currentWindowWidth = window.innerWidth;
+
         window.addEventListener("resize",
             function () {
+
+                if (currentWindowWidth == window.innerWidth) {
+                    // ウインドウ横幅が変わっていないため処理をキャンセル。(スマホ用)
+                    return;
+                }
+            
+                // ウインドウ横幅が変わったのでリサイズと見なす。
+                // 横幅を更新
+                currentWindowWidth = window.innerWidth;
+
                 this.mousedown();       //値の確定
 
                 this.getVirtualScrollData(true);
@@ -707,6 +727,7 @@ Vue.component('dora-vscroll', {
                 this.$forceUpdate();
             }.bind(this)
         );
+        
     }
     ,
     template: '\
@@ -723,7 +744,7 @@ Vue.component('dora-vscroll', {
          * @param {focusfield} focusを移動する（v-modelの値） ※ v-modelが複数ある場合は最初の方に移動
          *        外から this.$refs.page.gotoindex する場合は mounted以降で呼び出し
          */
-        gotoindex: function (index, focusfield) {
+        gotoindex: function (index,focusfield) {
 
             //this.bindItems.pushでdomが再作成されるので、その後に実行
             //このvueの動作を理解出来きてないと、はまることが多々あるかも・・
@@ -753,7 +774,7 @@ Vue.component('dora-vscroll', {
                         //課題
                         //最後のデータにエラーが発生した場合に、上キーで移動した場合、空欄になる（原因不明の不具合があったので）最後のデータは計算して出力するように変更
                         index = lastIndex;
-                        updownvalue = 1;
+                        updownvalue = 1;   
                     }
                     this.currentindex = index;
                     this.getVirtualScrollData(false, updownvalue);
@@ -762,7 +783,10 @@ Vue.component('dora-vscroll', {
                         let trArray = this.tableelement.querySelector('tbody').querySelectorAll('tr');
 
                         try {
-                            trArray[moveIndex].querySelector("[dora_MV='" + focusfield + "']").focus();
+                            //こちら入れないと値が変わらない場合あり
+                            setTimeout(function () {
+                                trArray[moveIndex].querySelector("[dora_MV='" + focusfield + "']").focus();
+                            }, 0);
                         }
                         catch (e) { };
                     }
@@ -846,7 +870,7 @@ Vue.component('dora-vscroll', {
 
                             if (enterFlag) {
                                 //this.tableelement.scrollLeft=0;
-
+                                
                                 let parentTD = objActive;
                                 let findFlag = false;
 
@@ -877,7 +901,7 @@ Vue.component('dora-vscroll', {
                                         }
                                         else if (obj.tabIndex != null && (+obj.tabIndex) < 0) {
                                             continue;
-                                        }
+                                        }                                        
                                         objActive = obj;
 
                                         break;
@@ -997,7 +1021,7 @@ Vue.component('dora-vscroll', {
             if (argsupdownvalue != null) {
                 updownvalue = argsupdownvalue;
 
-                if (updownvalue < 0) {
+                if (updownvalue < 0 ) {
                     //上に移動
                     scrollTop = 0;
                 }
@@ -1055,7 +1079,7 @@ Vue.component('dora-vscroll', {
                         }.bind(this)
                     );
                 }
-
+                        
                 //最終行
                 if (trArray.length != 1) {
 
@@ -1369,7 +1393,7 @@ var DoraFormat = {
     }
     ,
     //小数点
-    DECIMAL_SEPARATOR: "."
+    DECIMAL_SEPARATOR : "."
     ,
     //通貨区切り
     THOUSANDS_SEPARATOR: ","
@@ -1379,8 +1403,8 @@ var DoraFormat = {
 
 DoraFormat.GetFormatType = function (formatString) {
     let formattype = DoraFormat.FORMATTYPES.none;
-
-    if (formatString != null && formatString.length > 0) {
+    
+    if (formatString !=null && formatString.length > 0) {
         if (formatString.substr(0, 2) == "00") { //if (formatString.startsWith("00")) {                              
             formattype = DoraFormat.FORMATTYPES.zero;
         }
@@ -1391,11 +1415,11 @@ DoraFormat.GetFormatType = function (formatString) {
             formattype = DoraFormat.FORMATTYPES.date;
         }
         else if (
-            formatString.indexOf(DoraFormat.THOUSANDS_SEPARATOR) != -1 ||
-            formatString.indexOf(DoraFormat.DECIMAL_SEPARATOR) != -1 ||
-            formatString.indexOf("#") != -1 ||
-            formatString == "0"
-        ) {   /*数値系*/
+                formatString.indexOf(DoraFormat.THOUSANDS_SEPARATOR) != -1 ||
+                formatString.indexOf(DoraFormat.DECIMAL_SEPARATOR) != -1 ||
+                formatString.indexOf("#") != -1 ||
+                formatString == "0"
+            ) {   /*数値系*/
             formattype = DoraFormat.FORMATTYPES.currency;
         }
     }
@@ -1407,7 +1431,7 @@ DoraFormat.GetFormatType = function (formatString) {
 * @param value
 * @param formatString
 */
-DoraFormat.ParseFormat = function (value, formatString) {
+DoraFormat.ParseFormat = function(value, formatString) {
 
     if (value == null) {
         return null;
@@ -1559,9 +1583,9 @@ DoraFormat.ParseFormat = function (value, formatString) {
 
                     value = value.replace("ss", second.length == 1 ? "0" + second : second);
                     value = value.replace("s", second);
-
+                    
                     value = value.replace("fff", milli);
-
+                    
 
                 }
             }
@@ -1643,8 +1667,8 @@ DoraFormat.TransformFormat = function (value, formatString) {
             }
 
             //00 が0にならないため
-            if (+seisu == 0) {
-                seisu = 0;
+            if (+seisu ==0 ){
+                seisu =0;
             }
             value = seisu + shosu;
 
@@ -1704,7 +1728,7 @@ DoraFormat.TransformFormat = function (value, formatString) {
                     let minute = dateValue.getMinutes().toString();
                     let second = dateValue.getSeconds().toString()
                     let milli = dateValue.getMilliseconds().toString() + '000';
-                    milli = milli.substr(0, 3);
+                    milli = milli.substr(0,3);
 
                     value = value.replace("yyyy", year);
                     value = value.replace("yy", year.substr(2));
@@ -1764,7 +1788,7 @@ function changeDateValue(value) {
     if (sep.length > 1) {
         timestring = sep[1];
     }
-
+	
 
     let nowDateTime = new Date();
 
@@ -1777,7 +1801,7 @@ function changeDateValue(value) {
     let hour = "0";//= nowDateTime.getHours().toString();
     let minute = "0";// = nowDateTime.getMinutes().toString();
     let second = "0";//= nowDateTime.getSeconds().toString();
-
+	
     //時刻のみ
     if (value.indexOf(":") != -1 && timestring.length == 0) {
         year = "1900";
