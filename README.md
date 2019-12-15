@@ -9,10 +9,10 @@ Razorでゴリゴリ書きながらクライアントはVue
 好きなコンポーネントで作成して頂ければと思います。
 
 ## 開発環境
-Visual　Studio 2017（ASP.NET Core 2.1）   
+Visual　Studio 2019（ASP.NET Core 3.1）   
 
 ## 動作環境
-chrome、ie11でテスト  
+chrome、edgeでテスト  
 （データベースは未使用、slnファイルから実行すれば、動作確認することが可能です）
 
 ## 使用コンポーネント

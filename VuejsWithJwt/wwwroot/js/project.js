@@ -621,6 +621,7 @@ Project.PostApi = function (handler, json) {
                 posturl = handler;
             }
 
+            
             if (json == null) {
                 req.open('GET', posturl);
             }
